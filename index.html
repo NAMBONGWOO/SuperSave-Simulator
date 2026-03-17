@@ -32,6 +32,11 @@
         .input-row label { font-size: 0.75rem; font-weight: 700; color: var(--tether-gray); }
         .input-row input, .input-row select { width: 100px; padding: 5px; border: 1px solid #ddd; border-radius: 6px; text-align: right; font-weight: 800; color: var(--tether-mint); background: white; outline: none; font-size: 0.8rem; }
 
+        /* 상단 스테퍼 디자인 */
+        .main-stepper { display: inline-flex; align-items: center; gap: 4px; }
+        .btn-main { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: white; color: var(--tether-mint); font-weight: bold; cursor: pointer; }
+        .main-stepper input { width: 40px !important; text-align: center !important; }
+
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
@@ -57,12 +62,10 @@
         th:first-child { background: var(--tether-navy); }
         td:first-child { background: #fcfcfc; font-weight: 700; border-right: 1px solid #eee; }
         
-        /* 추가투입 열 최적화: 고정 폭을 없애고 내용에 맞게 자동 조절 */
         .col-add { width: min-content; padding-left: 2px; padding-right: 2px; }
         .boost-ctrl { display: inline-flex; align-items: center; justify-content: center; gap: 1px; }
         .btn-mini { width: 18px; height: 18px; border-radius: 4px; border: none; background: #fff3e0; color: var(--boost); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 1px solid #ffe0b2; flex-shrink: 0; }
         
-        /* 입력창: 패딩을 없애고 텍스트 길이에 맞춰 유연하게 작동 */
         .add-input { 
             width: 32px; 
             border: none; 
@@ -80,12 +83,11 @@
         .col-date { color: var(--tether-gray); font-size: 0.65rem; }
         .notice { font-size: 0.65rem; color: #999; margin-top: 12px; line-height: 1.4; padding-left: 5px; }
     </style>
-
 </head>
 <body>
 
 <div class="card">
-    <h2>SuperSave Simulator 1.13</h2>
+    <h2>SuperSave Simulator 1.14</h2>
     <div class="today-info" id="todayStr"></div>
     
     <div class="input-group">
@@ -104,7 +106,15 @@
             </select>
         </div>
         <div class="input-row"><label>신용매수가 / SUT 시세</label><span><input type="number" id="creditPrice" value="3.24" style="width:40px" oninput="runSimulation()"> / <input type="number" id="sutPrice" value="1.0" style="width:40px" oninput="runSimulation()"></span></div>
-        <div class="input-row"><label>시뮬레이션 기간 (주)</label><input type="number" id="weeks" value="12" min="1" max="52" oninput="initAndCalc()"></div>
+        
+        <div class="input-row">
+            <label>시뮬레이션 기간 (주)</label>
+            <div class="main-stepper">
+                <button class="btn-main" onclick="changeWeeks(-4)">-</button>
+                <input type="number" id="weeks" value="12" min="1" max="52" oninput="initAndCalc()">
+                <button class="btn-main" onclick="changeWeeks(4)">+</button>
+            </div>
+        </div>
     </div>
 
     <div class="table-container">
@@ -147,6 +157,13 @@
     function getRawNum(id) { return parseFloat(document.getElementById(id).value.replace(/,/g, "")) || 0; }
     function initAndCalc() { initTable(); runSimulation(); }
 
+    // 기간 업데이트 함수
+    function changeWeeks(delta) {
+        const input = document.getElementById('weeks');
+        input.value = Math.min(52, Math.max(1, (parseInt(input.value) || 0) + delta));
+        initAndCalc();
+    }
+
     function changeBoost(idx, delta) {
         const input = document.getElementById(`add_${idx}`);
         input.value = Math.max(0, (parseFloat(input.value) || 0) + delta);
@@ -154,7 +171,6 @@
         runSimulation();
     }
 
-    // 입력창 너비 자동 조절 함수
     function adjustWidth(el) {
         const len = el.value.length;
         el.style.width = (len > 3) ? (len * 7 + 10) + 'px' : '32px';
@@ -176,8 +192,10 @@
                 <td id="total_${i}">-</td><td class="col-highlight" id="contract_${i}">-</td>
                 <td class="col-accent" id="daily_${i}">-</td><td id="approved_${i}">-</td>
             </tr>`;
-            // 초기 렌더링 시 너비 맞춤
-            setTimeout(() => adjustWidth(document.getElementById(`add_${i}`)), 0);
+            setTimeout(() => {
+                const el = document.getElementById(`add_${i}`);
+                if(el) adjustWidth(el);
+            }, 0);
         }
     }
 
@@ -199,7 +217,9 @@
             dCur.setDate(firstStakingDate.getDate() + (i-1) * 7);
             if(document.getElementById(`date_${i}`)) document.getElementById(`date_${i}`).innerText = `${dCur.getMonth() + 1}/${dCur.getDate()}`;
             
-            let extra = parseFloat(document.getElementById(`add_${i}`).value) || 0;
+            const addInput = document.getElementById(`add_${i}`);
+            let extra = addInput ? (parseFloat(addInput.value) || 0) : 0;
+            
             let reward = cDaily * 7;
             let thisWeekTotal = reward + carryOver + extra;
             
