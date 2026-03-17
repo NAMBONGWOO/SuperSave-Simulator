@@ -3,189 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperSave 시뮬레이터 - 테너남</title>
+    <title>SuperSave Calculator - 테너남</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <style>
         :root {
             --tether-mint: #00938a;
+            --tether-mint-light: #e6f6f5;
             --tether-navy: #1a2a40;
             --tether-gray: #5e6c7c;
             --bg: #f4f7f9;
             --accent: #d93025;
-            --boost: #ff9800;
+            --warning-bg: #fff3f3;
         }
 
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); padding: 10px; color: var(--tether-navy); }
-        .card { background: white; padding: 18px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 780px; margin: auto; box-sizing: border-box; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; margin: 0; padding-top: 10px; color: var(--tether-navy); }
+        .card { background: white; padding: 15px 18px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 95%; max-width: 400px; box-sizing: border-box; position: relative; }
         
-        h2 { margin: 0 0 5px 0; font-weight: 800; font-size: 1.25rem; text-align: center; color: var(--tether-mint); }
-        .today-info { font-size: 0.75rem; text-align: center; color: var(--tether-gray); margin-bottom: 15px; }
+        .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+        h2 { margin: 0; font-weight: 800; font-size: 1.2rem; color: var(--tether-navy); }
         
-        .input-group { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .input-row label { font-size: 0.8rem; font-weight: 700; color: var(--tether-gray); }
-        .input-row input, .input-row select { width: 115px; padding: 5px; border: 1px solid #ddd; border-radius: 6px; text-align: right; font-weight: 800; color: var(--tether-mint); background: white; outline: none; }
+        .variable-panel { display: flex; flex-direction: column; gap: 4px; text-align: right; }
+        .v-input-group { display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
+        .v-input-group label { font-size: 0.65rem; color: var(--tether-gray); font-weight: 600; }
+        .v-input-group input { width: 55px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; padding: 1px 3px; font-weight: bold; color: var(--tether-navy); text-align: right; }
+        .v-input-group .highlight-input { color: var(--accent); border-color: #ffcccc; }
 
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
+        .input-container { margin-bottom: 12px; background: var(--tether-mint-light); padding: 10px; border-radius: 12px; }
+        label.main-label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 900; color: var(--tether-mint); text-align: center; }
+        
+        .stepper { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-step { width: 38px; height: 38px; border-radius: 10px; border: none; background: var(--tether-mint); color: white; font-size: 1.2rem; font-weight: bold; cursor: pointer; }
+        input.main-input { width: 110px; height: 38px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1.2rem; font-weight: 800; color: var(--tether-mint); text-align: center; outline: none; }
 
-        .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid #eee; margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.7rem; text-align: center; white-space: nowrap; }
-        th { background: var(--tether-navy); color: white; padding: 8px 3px; font-weight: 600; }
-        td { padding: 8px 3px; border-bottom: 1px solid #eee; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; margin-bottom: 5px; }
+        .section-title { font-size: 0.75rem; color: var(--tether-gray); font-weight: 700; border-left: 3px solid var(--tether-mint); padding-left: 6px; }
+        .ratio-input { width: 40px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.75rem; padding: 1px 3px; font-weight: 800; color: var(--accent); text-align: center; }
+
+        .result-container { background: #fff; border-radius: 12px; border: 1px solid #f0f0f0; overflow: hidden; margin-bottom: 3px; }
+        .row { display: flex; justify-content: space-between; padding: 7px 12px; border-bottom: 1px solid #f9f9f9; align-items: center; }
+        .label { color: var(--tether-gray); font-size: 0.8rem; }
+        .value { font-weight: 900; color: var(--tether-navy); font-size: 1rem; text-align: right; }
         
-        .boost-ctrl { display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .btn-mini { width: 24px; height: 24px; border-radius: 6px; border: none; background: #fff3e0; color: var(--boost); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: 1px solid #ffe0b2; }
-        .btn-mini:hover { background: var(--boost); color: white; }
-        .btn-mini:active { transform: scale(0.9); }
+        .sub-row { background: #fafafa; padding: 5px 12px; display: flex; justify-content: space-between; font-size: 0.75rem; color: #888; border-bottom: 1px solid #f0f0f0; }
+        .sub-val { font-weight: 800; color: var(--tether-mint); }
+
+        .total-row { background: #f1f7ff; padding: 7px 12px; display: flex; justify-content: space-between; align-items: center; }
+        .total-label { color: var(--tether-mint); font-weight: 800; font-size: 0.85rem; }
+        .total-value { color: var(--accent); font-size: 1.1rem; font-weight: 900; text-align: right; }
         
-        .add-input { width: 55px; border: none; text-align: right; font-size: 0.75rem; font-weight: 800; color: var(--boost); background: transparent; outline: none; }
+        .margin-info { text-align: right; padding-right: 8px; margin-bottom: 8px; }
+        .margin-text { font-size: 0.85rem; font-weight: 900; color: var(--tether-mint); }
+
+        /* 주의사항 영역 디자인 및 정렬 최적화 */
+        .notice-card { background: var(--warning-bg); border-radius: 10px; padding: 10px; margin-top: 15px; border: 1px solid #ffeded; }
+        .notice-title { font-size: 0.75rem; font-weight: 800; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center; gap: 4px; padding-left: 2px; }
+        .notice-content { font-size: 0.68rem; color: #777; line-height: 1.5; font-weight: 500; }
         
-        .col-highlight { background: #f1f7ff; font-weight: 800; }
-        .col-accent { color: var(--accent); font-weight: 800; }
-        .col-date { color: var(--tether-gray); font-weight: 600; }
-        .notice { font-size: 0.68rem; color: #999; margin-top: 15px; line-height: 1.5; padding-left: 5px; }
+        /* 구분점(•)을 타이틀에 맞추기 위한 정렬 */
+        .notice-content ul { margin: 0; padding-left: 14px; list-style-type: none; }
+        .notice-content li { position: relative; margin-bottom: 3px; padding-left: 12px; }
+        .notice-content li::before { content: '•'; position: absolute; left: 0; color: #ccc; }
+
+        .copyright { margin-top: 12px; font-size: 0.75rem; color: #bbb; text-align: right; border-top: 1px solid #eee; padding-top: 8px; font-weight: 600; }
     </style>
 
+<link rel="apple-touch-icon" href="icon.png">
 <link rel="manifest" href="manifest.json">
 
 </head>
 <body>
 
 <div class="card">
-    <h2>SuperSave Simulator 1.0</h2>
-    <div class="today-info" id="todayStr"></div>
-    
-    <div class="input-group">
-        <div class="input-row"><label>잔여 신용대금 (USDT)</label><input type="text" id="baseApproved" value="0" oninput="formatAndCalc(this)"></div>
-        <div class="input-row"><label>현재 일지급금 (USDT)</label><input type="text" id="baseDaily" value="0" oninput="formatAndCalc(this)"></div>
-        <div class="input-row">
-            <label>주정산 요일</label>
-            <select id="targetDay" onchange="runSimulation()">
-                <option value="1">월요일</option>
-                <option value="2">화요일</option>
-                <option value="3">수요일</option>
-                <option value="4">목요일</option>
-                <option value="5">금요일</option>
-                <option value="6">토요일</option>
-                <option value="0">일요일</option>
-            </select>
+    <div class="header-row">
+        <h2>SuperSave Calculator</h2>
+        <div class="variable-panel">
+            <div class="v-input-group">
+                <label>신용매수가</label>
+                <input type="number" id="creditPrice" step="0.01" value="3.24" oninput="calculate()" class="highlight-input">
+            </div>
+            <div class="v-input-group">
+                <label>SUT 시세</label>
+                <input type="number" id="marketPrice" step="0.01" value="1.00" oninput="calculate()">
+            </div>
         </div>
-        <div class="input-row"><label>신용매수가 / SUT 시세</label><span><input type="number" id="creditPrice" value="3.24" style="width:40px" oninput="runSimulation()"> / <input type="number" id="sutPrice" value="1.0" style="width:40px" oninput="runSimulation()"></span></div>
-        <div class="input-row"><label>시뮬레이션 기간 (주)</label><input type="number" id="weeks" value="12" min="1" max="52" oninput="initAndCalc()"></div>
+    </div>
+    
+    <div class="input-container">
+        <label class="main-label">USDT 준비금 (100 단위)</label>
+        <div class="stepper">
+            <button class="btn-step" onclick="stepChange(-100)">−</button>
+            <input type="text" id="usdtInput" class="main-input" value="1,000" oninput="handleInput(this)">
+            <button class="btn-step" onclick="stepChange(100)">+</button>
+        </div>
     </div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>차수</th><th>날짜</th><th>추가 투입금</th><th>가용금액 합계</th><th>재참여(USDT)</th><th>일지급금 현황</th><th>잔여 신용대금</th>
-                </tr>
-            </thead>
-            <tbody id="simBody"></tbody>
-        </table>
+    <div class="section-header">
+        <div class="section-title">Step 1. 기본 재참여</div>
+    </div>
+    <div class="result-container">
+        <div class="row"><span class="label">SUT 필요수량</span><span class="value" id="baseSut">0 SUT</span></div>
+        <div class="row"><span class="label">신용대금 승인</span><span class="value" id="app_base">0 USDT</span></div>
+        <div class="sub-row"><span>일지급: <span id="d_base" class="sub-val">0</span></span><span>주정산: <span id="w_base" class="sub-val">0</span></span></div>
+    </div>
+    <div class="margin-info"><span class="margin-text" id="m_base">순마진율: +0%</span></div>
+
+    <div class="section-header">
+        <div class="section-title">Step 2. Right 보상 (A)</div>
+        <div><input type="number" id="ratioA" class="ratio-input" value="50" oninput="calculate()"> <span style="font-size:0.7rem; font-weight:bold; color:var(--accent);">%</span></div>
+    </div>
+    <div class="result-container">
+        <div class="row"><span class="label">총 승인액</span><span class="value" id="app_50">0 USDT</span></div>
+        <div class="sub-row"><span>일지급: <span id="d_50" class="sub-val">0</span></span><span>주정산: <span id="w_50" class="sub-val">0</span></span></div>
+        <div class="total-row"><span class="total-label">SUT 필요수량 합계</span><span class="total-value" id="total50">0 SUT</span></div>
+    </div>
+    <div class="margin-info"><span class="margin-text" id="m_50">순마진율: +0%</span></div>
+
+    <div class="section-header">
+        <div class="section-title">Step 3. Right 보상 (B)</div>
+        <div><input type="number" id="ratioB" class="ratio-input" value="100" oninput="calculate()"> <span style="font-size:0.7rem; font-weight:bold; color:var(--accent);">%</span></div>
+    </div>
+    <div class="result-container">
+        <div class="row"><span class="label">총 승인액</span><span class="value" id="app_100">0 USDT</span></div>
+        <div class="sub-row"><span>일지급: <span id="d_100" class="sub-val">0</span></span><span>주정산: <span id="w_100" class="sub-val">0</span></span></div>
+        <div class="total-row"><span class="total-label">SUT 필요수량 합계</span><span class="total-value" id="total100">0 SUT</span></div>
+    </div>
+    <div class="margin-info"><span class="margin-text" id="m_100">순마진율: +0%</span></div>
+
+    <div class="notice-card">
+        <div class="notice-title">⚠️ 주의사항</div>
+        <div class="notice-content">
+            <ul>
+                <li>Right 보상 액면가가 100 USDT 미만일 경우 절사 적용됩니다.</li>
+                <li>연산 오차가 발생할 수 있으니 단순 참조용으로만 활용하십시오.</li>
+                <li>신용매수가, SUT 시세 등 변수 값을 반드시 확인하십시오.</li>
+            </ul>
+        </div>
     </div>
 
-    <div class="notice">
-        • 단위는 USDT 기준입니다.<br>
-        • 선택하신 요일과 접속일의 차이를 계산하여 1주차 시작일이 자동 결정됩니다.
-    </div>
+    <div class="copyright">© 테너남. All Rights Reserved.</div>
 </div>
 
 <script>
+    const input = document.getElementById('usdtInput');
+    const marketPriceInput = document.getElementById('marketPrice');
+    const creditPriceInput = document.getElementById('creditPrice');
+    const ratioAInput = document.getElementById('ratioA');
+    const ratioBInput = document.getElementById('ratioB');
+
     const f = (n, d = 0) => n.toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
-    
-    // 오늘 날짜 (2026-03-16)
-    const today = new Date(2026, 2, 16); 
-    const weekNames = ['일', '월', '화', '수', '목', '금', '토'];
-    document.getElementById('todayStr').innerText = `접속일: 2026년 3월 16일 (${weekNames[today.getDay()]}요일)`;
+    function formatComma(val) { return val.toString().replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+    function getRawNum(val) { return parseFloat(val.replace(/,/g, "")) || 0; }
+    function handleInput(el) { el.value = formatComma(getRawNum(el.value)); calculate(); }
+    function stepChange(val) { input.value = formatComma(Math.max(0, getRawNum(input.value) + val)); calculate(); }
 
-    window.onload = function() {
-        document.getElementById('targetDay').value = today.getDay();
-        initAndCalc();
-    };
-
-    function formatAndCalc(el) {
-        let val = el.value.replace(/[^0-9.]/g, '');
-        if (val !== "") {
-            let parts = val.split('.');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            el.value = parts.join('.');
-        }
-        runSimulation();
-    }
-
-    function getRawNum(id) { return parseFloat(document.getElementById(id).value.replace(/,/g, "")) || 0; }
-
-    function initAndCalc() { initTable(); runSimulation(); }
-
-    function changeBoost(idx, delta) {
-        const input = document.getElementById(`add_${idx}`);
-        input.value = Math.max(0, (parseFloat(input.value) || 0) + delta);
-        runSimulation();
-    }
-
-    function initTable() {
-        let weeks = parseInt(document.getElementById('weeks').value) || 12;
-        const tbody = document.getElementById('simBody');
-        let savedBoosts = {};
-        document.querySelectorAll('.add-input').forEach(input => { savedBoosts[input.id] = input.value; });
-        tbody.innerHTML = '';
-        for (let i = 1; i <= weeks; i++) {
-            let val = savedBoosts[`add_${i}`] || 0;
-            tbody.innerHTML += `<tr>
-                <td>${i}주</td><td id="date_${i}">-</td>
-                <td><div class="boost-ctrl"><button class="btn-mini" onclick="changeBoost(${i}, -50)">-</button>
-                <input type="number" class="add-input" id="add_${i}" value="${val}" oninput="runSimulation()">
-                <button class="btn-mini" onclick="changeBoost(${i}, 50)">+</button></div></td>
-                <td id="total_${i}">-</td><td class="col-highlight" id="contract_${i}">-</td>
-                <td class="col-accent" id="daily_${i}">-</td><td id="approved_${i}">-</td>
-            </tr>`;
-        }
-    }
-
-    function runSimulation() {
-        let cApp = getRawNum('baseApproved');
-        let cDaily = getRawNum('baseDaily');
-        const crPrice = getRawNum('creditPrice'), sPrice = getRawNum('sutPrice');
-        const targetDay = parseInt(document.getElementById('targetDay').value);
-        const weeks = parseInt(document.getElementById('weeks').value) || 0;
+    function calculate() {
+        const reserveUsdt = getRawNum(input.value);
+        const marketPrice = parseFloat(marketPriceInput.value) || 0;
+        const creditPrice = parseFloat(creditPriceInput.value) || 0;
+        const ratioA = (parseFloat(ratioAInput.value) / 100) || 0;
+        const ratioB = (parseFloat(ratioBInput.value) / 100) || 0;
         
-        let diff = targetDay - today.getDay();
-        if (diff < 0) diff += 7; 
+        if (reserveUsdt === 0 || creditPrice === 0) return;
+
+        const baseSutQuantity = (reserveUsdt / creditPrice) * 1.2; 
+        const appBase = reserveUsdt * 2.4;
         
-        let firstStakingDate = new Date(today);
-        firstStakingDate.setDate(today.getDate() + diff);
+        const updateUI = (app, totalSut, ids) => {
+            const principal = reserveUsdt + (totalSut * marketPrice); 
+            const margin = ((app / principal) - 1) * 100;
+            const daily = app / 365;
 
-        let carryOver = 0;
+            document.getElementById(ids.app).innerText = f(app) + ' USDT';
+            document.getElementById(ids.daily).innerText = f(daily, 3);
+            document.getElementById(ids.weekly).innerText = f(daily * 7, 2);
+            document.getElementById(ids.margin).innerText = `순마진율: +${f(margin, 1)}%`;
+            if(ids.total) document.getElementById(ids.total).innerText = f(totalSut, 1) + ' SUT';
+        };
 
-        for (let i = 1; i <= weeks; i++) {
-            let dCur = new Date(firstStakingDate); 
-            dCur.setDate(firstStakingDate.getDate() + (i-1) * 7);
-            if(document.getElementById(`date_${i}`)) document.getElementById(`date_${i}`).innerText = `${dCur.getMonth() + 1}/${dCur.getDate()}`;
-            
-            let extra = parseFloat(document.getElementById(`add_${i}`).value) || 0;
-            let reward = cDaily * 7;
-            let thisWeekTotal = reward + carryOver + extra;
-            
-            const unitCost = 100 + ((100 / crPrice) * 1.2 * sPrice);
-            let units = (unitCost > 0) ? Math.floor(thisWeekTotal / unitCost) : 0;
-            let conAmt = units * 100;
-            let conCost = 0;
+        document.getElementById('baseSut').innerText = f(baseSutQuantity, 1) + ' SUT';
+        updateUI(appBase, baseSutQuantity, {app: 'app_base', daily: 'd_base', weekly: 'w_base', margin: 'm_base'});
 
-            document.getElementById(`total_${i}`).innerText = f(thisWeekTotal, 1);
-            document.getElementById(`daily_${i}`).innerText = f(cDaily, 3);
-            document.getElementById(`approved_${i}`).innerText = f(cApp, 0);
-            document.getElementById(`contract_${i}`).innerText = conAmt > 0 ? f(conAmt) : '-';
+        const contractableBonusA = Math.floor((reserveUsdt * ratioA) / 100) * 100;
+        updateUI(appBase + (contractableBonusA * 1.2), baseSutQuantity + Math.ceil(baseSutQuantity * ratioA), {app: 'app_50', daily: 'd_50', weekly: 'w_50', margin: 'm_50', total: 'total50'});
 
-            if (conAmt > 0) {
-                conCost = conAmt + (Math.ceil(conAmt / crPrice * 1.2) * sPrice);
-                cApp += (conAmt * 2.4);
-                cDaily += (conAmt * 2.4 / 365);
-            }
-            carryOver = thisWeekTotal - conCost;
-        }
+        const contractableBonusB = Math.floor((reserveUsdt * ratioB) / 100) * 100;
+        updateUI(appBase + (contractableBonusB * 1.2), baseSutQuantity + Math.ceil(baseSutQuantity * ratioB), {app: 'app_100', daily: 'd_100', weekly: 'w_100', margin: 'm_100', total: 'total100'});
     }
+    calculate();
 </script>
 </body>
 </html>
