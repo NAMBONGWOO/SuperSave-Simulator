@@ -6,78 +6,36 @@
     <meta name="theme-color" content="#00D1B2">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="manifest" href="manifest.json">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SuperSave 시뮬레이터 - 테너남</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <style>
-        :root {
-            --tether-mint: #00938a;
-            --tether-navy: #1a2a40;
-            --tether-gray: #5e6c7c;
-            --bg: #f4f7f9;
-            --accent: #d93025;
-            --boost: #ff9800;
-        }
-
+        :root { --tether-mint: #00938a; --tether-navy: #1a2a40; --tether-gray: #5e6c7c; --bg: #f4f7f9; --accent: #d93025; --boost: #ff9800; }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); padding: 10px; color: var(--tether-navy); -webkit-text-size-adjust: none; }
         .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 780px; margin: auto; box-sizing: border-box; }
-        
         h2 { margin: 0 0 5px 0; font-weight: 800; font-size: 1.2rem; text-align: center; color: var(--tether-mint); }
         .today-info { font-size: 0.7rem; text-align: center; color: var(--tether-gray); margin-bottom: 12px; }
-        
         .input-group { background: #f8f9fa; padding: 12px; border-radius: 12px; margin-bottom: 15px; }
         .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .input-row label { font-size: 0.75rem; font-weight: 700; color: var(--tether-gray); }
         .input-row input, .input-row select { width: 100px; padding: 5px; border: 1px solid #ddd; border-radius: 6px; text-align: right; font-weight: 800; color: var(--tether-mint); background: white; outline: none; font-size: 0.8rem; }
-
-        /* 상단 스테퍼 디자인 */
         .main-stepper { display: inline-flex; align-items: center; gap: 4px; }
         .btn-main { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: white; color: var(--tether-mint); font-weight: bold; cursor: pointer; }
         .main-stepper input { width: 40px !important; text-align: center !important; }
-
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
-
-        .table-container { 
-            overflow-x: auto; 
-            border-radius: 10px; 
-            border: 1px solid #eee; 
-            margin-top: 10px;
-            -webkit-overflow-scrolling: touch;
-        }
+        .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid #eee; margin-top: 10px; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; font-size: 0.68rem; text-align: center; white-space: nowrap; table-layout: auto; }
-        
         th { background: var(--tether-navy); color: white; padding: 8px 3px; font-weight: 600; letter-spacing: -0.3px; }
         td { padding: 7px 3px; border-bottom: 1px solid #eee; letter-spacing: -0.4px; }
-
-        th:first-child, td:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 2;
-            padding-left: 8px;
-            padding-right: 8px;
-        }
+        th:first-child, td:first-child { position: sticky; left: 0; z-index: 2; padding-left: 8px; padding-right: 8px; }
         th:first-child { background: var(--tether-navy); }
         td:first-child { background: #fcfcfc; font-weight: 700; border-right: 1px solid #eee; }
-        
         .col-add { width: min-content; padding-left: 2px; padding-right: 2px; }
         .boost-ctrl { display: inline-flex; align-items: center; justify-content: center; gap: 1px; }
         .btn-mini { width: 18px; height: 18px; border-radius: 4px; border: none; background: #fff3e0; color: var(--boost); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 1px solid #ffe0b2; flex-shrink: 0; }
-        
-        .add-input { 
-            width: 32px; 
-            border: none; 
-            text-align: center; 
-            font-size: 0.7rem; 
-            font-weight: 800; 
-            color: var(--boost); 
-            background: transparent; 
-            outline: none; 
-            padding: 0;
-        }
-        
+        .add-input { width: 32px; border: none; text-align: center; font-size: 0.7rem; font-weight: 800; color: var(--boost); background: transparent; outline: none; padding: 0; }
         .col-highlight { background: #f1f7ff; font-weight: 800; color: #0056b3; }
         .col-accent { color: var(--accent); font-weight: 800; }
         .col-date { color: var(--tether-gray); font-size: 0.65rem; }
@@ -87,26 +45,19 @@
 <body>
 
 <div class="card">
-    <h2>SuperSave Simulator 1.14</h2>
+    <h2>SuperSave Simulator 1.16</h2>
     <div class="today-info" id="todayStr"></div>
     
     <div class="input-group">
-        <div class="input-row"><label>잔여 신용대금 (USDT)</label><input type="text" id="baseApproved" value="0" oninput="formatAndCalc(this)"></div>
-        <div class="input-row"><label>현재 일지급금 (USDT)</label><input type="text" id="baseDaily" value="0" oninput="formatAndCalc(this)"></div>
+        <div class="input-row"><label>잔여 신용대금 (USDT)</label><input type="text" id="baseApproved" value="0" onfocus="if(this.value=='0')this.value=''" onblur="if(this.value=='')this.value='0'" oninput="formatAndCalc(this)"></div>
+        <div class="input-row"><label>현재 일지급금 (USDT)</label><input type="text" id="baseDaily" value="0" onfocus="if(this.value=='0')this.value=''" onblur="if(this.value=='')this.value='0'" oninput="formatAndCalc(this)"></div>
         <div class="input-row">
             <label>주정산 요일</label>
             <select id="targetDay" onchange="runSimulation()">
-                <option value="1">월요일</option>
-                <option value="2">화요일</option>
-                <option value="3">수요일</option>
-                <option value="4">목요일</option>
-                <option value="5">금요일</option>
-                <option value="6">토요일</option>
-                <option value="0">일요일</option>
+                <option value="1">월요일</option><option value="2">화요일</option><option value="3">수요일</option><option value="4">목요일</option><option value="5">금요일</option><option value="6">토요일</option><option value="0">일요일</option>
             </select>
         </div>
         <div class="input-row"><label>신용매수가 / SUT 시세</label><span><input type="number" id="creditPrice" value="3.24" style="width:40px" oninput="runSimulation()"> / <input type="number" id="sutPrice" value="1.0" style="width:40px" oninput="runSimulation()"></span></div>
-        
         <div class="input-row">
             <label>시뮬레이션 기간 (주)</label>
             <div class="main-stepper">
@@ -127,20 +78,17 @@
             <tbody id="simBody"></tbody>
         </table>
     </div>
-
-    <div class="notice">
-        • 단위: USDT / 숫자가 길어지면 열 너비가 자동으로 최적화됩니다.
-    </div>
+    <div class="notice">• 단위: USDT / 차기 정산일 기준 v1.16</div>
 </div>
 
 <script>
     const f = (n, d = 0) => n.toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
-    const today = new Date(2026, 2, 16); 
+    const today = new Date(2026, 2, 17); // 오늘 3월 17일(화)
     const weekNames = ['일', '월', '화', '수', '목', '금', '토'];
-    document.getElementById('todayStr').innerText = `접속일: 2026년 3월 16일 (${weekNames[today.getDay()]}요일)`;
+    document.getElementById('todayStr').innerText = `접속일: 2026년 3월 17일 (${weekNames[today.getDay()]}요일)`;
 
     window.onload = function() {
-        document.getElementById('targetDay').value = today.getDay();
+        document.getElementById('targetDay').value = 1; // 기본 월요일 설정
         initAndCalc();
     };
 
@@ -157,7 +105,6 @@
     function getRawNum(id) { return parseFloat(document.getElementById(id).value.replace(/,/g, "")) || 0; }
     function initAndCalc() { initTable(); runSimulation(); }
 
-    // 기간 업데이트 함수
     function changeWeeks(delta) {
         const input = document.getElementById('weeks');
         input.value = Math.min(52, Math.max(1, (parseInt(input.value) || 0) + delta));
@@ -192,22 +139,22 @@
                 <td id="total_${i}">-</td><td class="col-highlight" id="contract_${i}">-</td>
                 <td class="col-accent" id="daily_${i}">-</td><td id="approved_${i}">-</td>
             </tr>`;
-            setTimeout(() => {
-                const el = document.getElementById(`add_${i}`);
-                if(el) adjustWidth(el);
-            }, 0);
+            setTimeout(() => { const el = document.getElementById(`add_${i}`); if(el) adjustWidth(el); }, 0);
         }
     }
 
     function runSimulation() {
-        let cApp = getRawNum('baseApproved');
-        let cDaily = getRawNum('baseDaily');
+        let currentApproved = getRawNum('baseApproved');
+        let currentDaily = getRawNum('baseDaily');
         const crPrice = getRawNum('creditPrice'), sPrice = getRawNum('sutPrice');
         const targetDay = parseInt(document.getElementById('targetDay').value);
         const weeks = parseInt(document.getElementById('weeks').value) || 0;
         
+        // [날짜 로직 교정]
         let diff = targetDay - today.getDay();
-        if (diff < 0) diff += 7; 
+        // 타겟 요일이 오늘과 같거나 오늘보다 이전이면 무조건 다음 주(+7일)로 설정
+        if (diff <= 0) diff += 7; 
+        
         let firstStakingDate = new Date(today);
         firstStakingDate.setDate(today.getDate() + diff);
         let carryOver = 0;
@@ -217,28 +164,27 @@
             dCur.setDate(firstStakingDate.getDate() + (i-1) * 7);
             if(document.getElementById(`date_${i}`)) document.getElementById(`date_${i}`).innerText = `${dCur.getMonth() + 1}/${dCur.getDate()}`;
             
-            const addInput = document.getElementById(`add_${i}`);
-            let extra = addInput ? (parseFloat(addInput.value) || 0) : 0;
-            
-            let reward = cDaily * 7;
+            let extra = parseFloat(document.getElementById(`add_${i}`).value) || 0;
+            let reward = currentDaily * 7;
             let thisWeekTotal = reward + carryOver + extra;
             
             const unitCost = 100 + ((100 / crPrice) * 1.2 * sPrice);
             let units = (unitCost > 0) ? Math.floor(thisWeekTotal / unitCost) : 0;
             let conAmt = units * 100;
-            let conCost = 0;
-
-            if(document.getElementById(`total_${i}`)) document.getElementById(`total_${i}`).innerText = f(thisWeekTotal, 0);
-            if(document.getElementById(`daily_${i}`)) document.getElementById(`daily_${i}`).innerText = f(cDaily, 0);
-            if(document.getElementById(`approved_${i}`)) document.getElementById(`approved_${i}`).innerText = f(cApp, 0);
-            if(document.getElementById(`contract_${i}`)) document.getElementById(`contract_${i}`).innerText = conAmt > 0 ? f(conAmt) : '-';
 
             if (conAmt > 0) {
-                conCost = conAmt + (Math.ceil(conAmt / crPrice * 1.2) * sPrice);
-                cApp += (conAmt * 2.4);
-                cDaily += (conAmt * 2.4 / 365);
+                let conCost = conAmt + (Math.ceil(conAmt / crPrice * 1.2) * sPrice);
+                currentApproved += (conAmt * 2.4);
+                currentDaily += (conAmt * 2.4 / 365);
+                carryOver = thisWeekTotal - conCost;
+            } else {
+                carryOver = thisWeekTotal;
             }
-            carryOver = thisWeekTotal - conCost;
+
+            if(document.getElementById(`total_${i}`)) document.getElementById(`total_${i}`).innerText = f(thisWeekTotal, 0);
+            if(document.getElementById(`daily_${i}`)) document.getElementById(`daily_${i}`).innerText = f(currentDaily, 1);
+            if(document.getElementById(`approved_${i}`)) document.getElementById(`approved_${i}`).innerText = f(currentApproved, 0);
+            if(document.getElementById(`contract_${i}`)) document.getElementById(`contract_${i}`).innerText = conAmt > 0 ? f(conAmt) : '-';
         }
     }
 </script>
