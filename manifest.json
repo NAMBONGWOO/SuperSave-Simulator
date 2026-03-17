@@ -1,0 +1,15 @@
+{
+  "name": "SuperSave 시뮬레이터",
+  "short_name": "SuperSave",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3f51b5",
+  "icons": [
+    {
+      "src": "사용자지정_아이콘_파일명.png", 
+      "sizes": "사용자지정_아이콘_크기x사용자지정_아이콘_크기",
+      "type": "image/png"
+    }
+  ]
+}
