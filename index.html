@@ -13,7 +13,7 @@
     <style>
         :root { --tether-mint: #00938a; --tether-navy: #1a2a40; --tether-gray: #5e6c7c; --bg: #f4f7f9; --accent: #d93025; --boost: #ff9800; }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); padding: 10px; color: var(--tether-navy); -webkit-text-size-adjust: none; }
-        .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 780px; margin: auto; box-sizing: border-box; }
+        .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 800px; margin: auto; box-sizing: border-box; }
         h2 { margin: 0 0 5px 0; font-weight: 800; font-size: 1.2rem; text-align: center; color: var(--tether-mint); }
         .today-info { font-size: 0.7rem; text-align: center; color: var(--tether-gray); margin-bottom: 12px; }
         .input-group { background: #f8f9fa; padding: 12px; border-radius: 12px; margin-bottom: 15px; }
@@ -26,7 +26,7 @@
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid #eee; margin-top: 10px; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.68rem; text-align: center; white-space: nowrap; table-layout: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.65rem; text-align: center; white-space: nowrap; table-layout: auto; }
         th { background: var(--tether-navy); color: white; padding: 8px 3px; font-weight: 600; letter-spacing: -0.3px; }
         td { padding: 7px 3px; border-bottom: 1px solid #eee; letter-spacing: -0.4px; }
         th:first-child, td:first-child { position: sticky; left: 0; z-index: 2; padding-left: 8px; padding-right: 8px; }
@@ -38,14 +38,15 @@
         .add-input { width: 32px; border: none; text-align: center; font-size: 0.7rem; font-weight: 800; color: var(--boost); background: transparent; outline: none; padding: 0; }
         .col-highlight { background: #f1f7ff; font-weight: 800; color: #0056b3; }
         .col-accent { color: var(--accent); font-weight: 800; }
-        .col-date { color: var(--tether-gray); font-size: 0.65rem; }
+        .col-weekly { color: #2e7d32; font-weight: 800; } /* 주정산 열 전용 색상 */
+        .col-date { color: var(--tether-gray); font-size: 0.6rem; }
         .notice { font-size: 0.65rem; color: #999; margin-top: 12px; line-height: 1.4; padding-left: 5px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>SuperSave Simulator 1.16</h2>
+    <h2>SuperSave Simulator 1.17</h2>
     <div class="today-info" id="todayStr"></div>
     
     <div class="input-group">
@@ -72,13 +73,13 @@
         <table>
             <thead>
                 <tr>
-                    <th>차수</th><th>날짜</th><th class="col-add">추가 투입</th><th>가용 합계</th><th>재참여</th><th>일지급</th><th>잔여 대금</th>
+                    <th>차수</th><th>날짜</th><th class="col-add">추가투입</th><th>가용합계</th><th>재참여</th><th>일지급</th><th>주정산</th><th>잔여대금</th>
                 </tr>
             </thead>
             <tbody id="simBody"></tbody>
         </table>
     </div>
-    <div class="notice">• 단위: USDT / 차기 정산일 기준 v1.16</div>
+    <div class="notice">• 단위: USDT / 주정산 열 추가 v1.17</div>
 </div>
 
 <script>
@@ -137,7 +138,7 @@
                 <input type="number" class="add-input" id="add_${i}" value="${val}" oninput="adjustWidth(this); runSimulation()">
                 <button class="btn-mini" onclick="changeBoost(${i}, 50)">+</button></div></td>
                 <td id="total_${i}">-</td><td class="col-highlight" id="contract_${i}">-</td>
-                <td class="col-accent" id="daily_${i}">-</td><td id="approved_${i}">-</td>
+                <td class="col-accent" id="daily_${i}">-</td><td class="col-weekly" id="weekly_${i}">-</td><td id="approved_${i}">-</td>
             </tr>`;
             setTimeout(() => { const el = document.getElementById(`add_${i}`); if(el) adjustWidth(el); }, 0);
         }
@@ -150,9 +151,7 @@
         const targetDay = parseInt(document.getElementById('targetDay').value);
         const weeks = parseInt(document.getElementById('weeks').value) || 0;
         
-        // [날짜 로직 교정]
         let diff = targetDay - today.getDay();
-        // 타겟 요일이 오늘과 같거나 오늘보다 이전이면 무조건 다음 주(+7일)로 설정
         if (diff <= 0) diff += 7; 
         
         let firstStakingDate = new Date(today);
@@ -181,8 +180,10 @@
                 carryOver = thisWeekTotal;
             }
 
+            // 결과 업데이트
             if(document.getElementById(`total_${i}`)) document.getElementById(`total_${i}`).innerText = f(thisWeekTotal, 0);
             if(document.getElementById(`daily_${i}`)) document.getElementById(`daily_${i}`).innerText = f(currentDaily, 1);
+            if(document.getElementById(`weekly_${i}`)) document.getElementById(`weekly_${i}`).innerText = f(currentDaily * 7, 1); // 주정산액 표시
             if(document.getElementById(`approved_${i}`)) document.getElementById(`approved_${i}`).innerText = f(currentApproved, 0);
             if(document.getElementById(`contract_${i}`)) document.getElementById(`contract_${i}`).innerText = conAmt > 0 ? f(conAmt) : '-';
         }
