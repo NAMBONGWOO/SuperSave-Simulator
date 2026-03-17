@@ -44,38 +44,36 @@
         }
         table { width: 100%; border-collapse: collapse; font-size: 0.68rem; text-align: center; white-space: nowrap; table-layout: auto; }
         
-        th { 
-            background: var(--tether-navy); 
-            color: white; 
-            padding: 8px 3px; 
-            font-weight: 600;
-            letter-spacing: -0.3px;
-        }
-        
-        td { 
-            padding: 7px 3px; 
-            border-bottom: 1px solid #eee; 
-            letter-spacing: -0.4px; 
-        }
+        th { background: var(--tether-navy); color: white; padding: 8px 3px; font-weight: 600; letter-spacing: -0.3px; }
+        td { padding: 7px 3px; border-bottom: 1px solid #eee; letter-spacing: -0.4px; }
 
-        /* 차수 열: 고정 폭 제거, 자동 조절 및 고정 */
         th:first-child, td:first-child {
             position: sticky;
             left: 0;
             z-index: 2;
-            padding-left: 5px;
-            padding-right: 5px;
+            padding-left: 8px;
+            padding-right: 8px;
         }
         th:first-child { background: var(--tether-navy); }
         td:first-child { background: #fcfcfc; font-weight: 700; border-right: 1px solid #eee; }
         
-        /* 추가투입 열: 가변 폭 설정 */
-        .col-add { min-width: 60px; width: auto; }
-        .boost-ctrl { display: flex; align-items: center; justify-content: center; gap: 2px; }
+        /* 추가투입 열 최적화: 고정 폭을 없애고 내용에 맞게 자동 조절 */
+        .col-add { width: min-content; padding-left: 2px; padding-right: 2px; }
+        .boost-ctrl { display: inline-flex; align-items: center; justify-content: center; gap: 1px; }
         .btn-mini { width: 18px; height: 18px; border-radius: 4px; border: none; background: #fff3e0; color: var(--boost); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 1px solid #ffe0b2; flex-shrink: 0; }
         
-        /* 추가 투입 입력창: 숫자에 따라 자동 확장 */
-        .add-input { width: 35px; min-width: 25px; border: none; text-align: right; font-size: 0.7rem; font-weight: 800; color: var(--boost); background: transparent; outline: none; }
+        /* 입력창: 패딩을 없애고 텍스트 길이에 맞춰 유연하게 작동 */
+        .add-input { 
+            width: 32px; 
+            border: none; 
+            text-align: center; 
+            font-size: 0.7rem; 
+            font-weight: 800; 
+            color: var(--boost); 
+            background: transparent; 
+            outline: none; 
+            padding: 0;
+        }
         
         .col-highlight { background: #f1f7ff; font-weight: 800; color: #0056b3; }
         .col-accent { color: var(--accent); font-weight: 800; }
@@ -87,7 +85,7 @@
 <body>
 
 <div class="card">
-    <h2>SuperSave Simulator 1.12</h2>
+    <h2>SuperSave Simulator 1.13</h2>
     <div class="today-info" id="todayStr"></div>
     
     <div class="input-group">
@@ -113,7 +111,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>차수</th><th>날짜</th><th class="col-add">추가 투입</th><th>가용 합계</th><th>재참여</th><th>일지급 현황</th><th>잔여 대금</th>
+                    <th>차수</th><th>날짜</th><th class="col-add">추가 투입</th><th>가용 합계</th><th>재참여</th><th>일지급</th><th>잔여 대금</th>
                 </tr>
             </thead>
             <tbody id="simBody"></tbody>
@@ -121,14 +119,12 @@
     </div>
 
     <div class="notice">
-        • 단위: USDT / 숫자가 밀릴 경우 좌우로 스크롤 하세요.<br>
-        • 가용합계 및 일지급금은 정수(USDT)로 표시됩니다.
+        • 단위: USDT / 숫자가 길어지면 열 너비가 자동으로 최적화됩니다.
     </div>
 </div>
 
 <script>
     const f = (n, d = 0) => n.toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
-    
     const today = new Date(2026, 2, 16); 
     const weekNames = ['일', '월', '화', '수', '목', '금', '토'];
     document.getElementById('todayStr').innerText = `접속일: 2026년 3월 16일 (${weekNames[today.getDay()]}요일)`;
@@ -149,15 +145,19 @@
     }
 
     function getRawNum(id) { return parseFloat(document.getElementById(id).value.replace(/,/g, "")) || 0; }
-
     function initAndCalc() { initTable(); runSimulation(); }
 
     function changeBoost(idx, delta) {
         const input = document.getElementById(`add_${idx}`);
         input.value = Math.max(0, (parseFloat(input.value) || 0) + delta);
-        // 입력값 길이에 따른 자동 폭 조절
-        input.style.width = (input.value.length * 8 + 20) + 'px';
+        adjustWidth(input);
         runSimulation();
+    }
+
+    // 입력창 너비 자동 조절 함수
+    function adjustWidth(el) {
+        const len = el.value.length;
+        el.style.width = (len > 3) ? (len * 7 + 10) + 'px' : '32px';
     }
 
     function initTable() {
@@ -171,11 +171,13 @@
             tbody.innerHTML += `<tr>
                 <td>${i}</td><td id="date_${i}" class="col-date">-</td>
                 <td class="col-add"><div class="boost-ctrl"><button class="btn-mini" onclick="changeBoost(${i}, -50)">-</button>
-                <input type="number" class="add-input" id="add_${i}" value="${val}" oninput="this.style.width=(this.value.length*8+20)+'px'; runSimulation()">
+                <input type="number" class="add-input" id="add_${i}" value="${val}" oninput="adjustWidth(this); runSimulation()">
                 <button class="btn-mini" onclick="changeBoost(${i}, 50)">+</button></div></td>
                 <td id="total_${i}">-</td><td class="col-highlight" id="contract_${i}">-</td>
                 <td class="col-accent" id="daily_${i}">-</td><td id="approved_${i}">-</td>
             </tr>`;
+            // 초기 렌더링 시 너비 맞춤
+            setTimeout(() => adjustWidth(document.getElementById(`add_${i}`)), 0);
         }
     }
 
@@ -188,10 +190,8 @@
         
         let diff = targetDay - today.getDay();
         if (diff < 0) diff += 7; 
-        
         let firstStakingDate = new Date(today);
         firstStakingDate.setDate(today.getDate() + diff);
-
         let carryOver = 0;
 
         for (let i = 1; i <= weeks; i++) {
@@ -208,8 +208,8 @@
             let conAmt = units * 100;
             let conCost = 0;
 
-            if(document.getElementById(`total_${i}`)) document.getElementById(`total_${i}`).innerText = f(thisWeekTotal, 0); // 소수점 제거
-            if(document.getElementById(`daily_${i}`)) document.getElementById(`daily_${i}`).innerText = f(cDaily, 0); // 소수점 제거
+            if(document.getElementById(`total_${i}`)) document.getElementById(`total_${i}`).innerText = f(thisWeekTotal, 0);
+            if(document.getElementById(`daily_${i}`)) document.getElementById(`daily_${i}`).innerText = f(cDaily, 0);
             if(document.getElementById(`approved_${i}`)) document.getElementById(`approved_${i}`).innerText = f(cApp, 0);
             if(document.getElementById(`contract_${i}`)) document.getElementById(`contract_${i}`).innerText = conAmt > 0 ? f(conAmt) : '-';
 
