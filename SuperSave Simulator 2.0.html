@@ -48,7 +48,87 @@
         }
         .sub { font-size: 0.7rem; text-align: center; color: var(--gray); margin-bottom: 14px; }
 
-        /* 입력 */
+        /* ── 실시간 시세 배너 ── */
+        .price-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #e0f5f4, #f0faf9);
+            border: 1px solid #b2dfdb;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            gap: 10px;
+        }
+        .price-banner-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .price-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--gray);
+            letter-spacing: 0.06em;
+        }
+        .price-live {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        .price-usdt {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: var(--mint);
+            letter-spacing: -0.02em;
+        }
+        .price-krw {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--gray);
+        }
+        .price-change {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 8px;
+        }
+        .price-change.up { background: #e8f5e9; color: #2e7d32; }
+        .price-change.dn { background: #ffebee; color: #c62828; }
+        .price-change.flat { background: #f5f5f5; color: var(--gray); }
+        .price-time { font-size: 0.65rem; color: var(--gray); }
+
+        .price-right { display: flex; align-items: center; gap: 8px; }
+
+        .apply-btn {
+            padding: 6px 12px;
+            background: var(--mint);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Pretendard', sans-serif;
+            white-space: nowrap;
+        }
+        .apply-btn:active { opacity: 0.85; transform: scale(0.97); }
+
+        .refresh-btn {
+            width: 32px; height: 32px;
+            background: white;
+            border: 1px solid #b2dfdb;
+            border-radius: 8px;
+            color: var(--mint);
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Pretendard', sans-serif;
+        }
+        .refresh-btn:active { opacity: 0.75; }
+        .refresh-btn.spinning { animation: spin 0.8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .price-loading { font-size: 0.75rem; color: var(--gray); }
+        .price-error { font-size: 0.72rem; color: var(--accent); }
+
+        /* ── 입력 영역 ── */
         .input-group { background: #f8f9fa; padding: 11px 13px; border-radius: 14px; margin-bottom: 12px; }
         .irow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .irow2:last-child { margin-bottom: 0; }
@@ -60,6 +140,7 @@
             background: white; outline: none; font-size: 0.85rem; width: 95px;
             font-family: 'Pretendard', sans-serif;
         }
+        .ifield input.live-synced { border-color: var(--mint); background: #f0faf9; }
         .ifield select { width: 88px; }
         .price-pair { display: flex; align-items: center; gap: 4px; }
         .price-pair input { width: 54px; }
@@ -72,7 +153,7 @@
         }
         .stepper input { width: 40px; text-align: center; }
 
-        /* 시나리오 */
+        /* ── 변동 시나리오 ── */
         .scenario-group {
             background: #f0faf9; border: 1px solid #b2dfdb;
             padding: 11px 13px; border-radius: 14px; margin-bottom: 12px;
@@ -90,7 +171,7 @@
         }
         .sch-note { font-size: 0.68rem; color: var(--gray); margin-top: 6px; line-height: 1.5; }
 
-        /* 요약 */
+        /* ── 요약 카드 ── */
         .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
         .sum-card { background: #f8f9fa; border-radius: 12px; padding: 10px 12px; }
         .sum-label { font-size: 0.65rem; color: var(--gray); margin-bottom: 3px; line-height: 1.4; }
@@ -99,7 +180,7 @@
         .sum-val.mint   { color: var(--mint); }
         .sum-val.purple { color: var(--purple); }
 
-        /* 테이블 */
+        /* ── 테이블 ── */
         .tbl-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid #eee; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: right; white-space: nowrap; table-layout: auto; }
         th { background: var(--navy); color: white; padding: 8px 6px; font-weight: 600; text-align: center; font-size: 0.78rem; }
@@ -144,14 +225,14 @@
             font-family: 'Pretendard', sans-serif;
         }
 
-        /* 차트 */
+        /* ── 차트 ── */
         .chart-title { font-size: 0.88rem; font-weight: 800; color: var(--navy); margin-bottom: 10px; }
         .chart-wrap { position: relative; width: 100%; height: 260px; }
         .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; font-size: 0.72rem; }
         .legend-item { display: flex; align-items: center; gap: 5px; color: var(--gray); }
         .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-        /* 저장 버튼 */
+        /* ── 저장 버튼 ── */
         .save-btn {
             width: 100%; height: 46px; background: var(--navy); color: white;
             border: none; border-radius: 14px; font-weight: 800; font-size: 0.95rem;
@@ -171,6 +252,22 @@
 <div class="card" id="captureArea">
     <h2>SuperSave Simulator <span class="badge">2.0</span></h2>
     <div class="sub" id="todayStr"></div>
+
+    <!-- 실시간 시세 배너 -->
+    <div class="price-banner" id="priceBanner">
+        <div class="price-banner-left">
+            <span class="price-tag">SUT 실시간 시세</span>
+            <div class="price-live" id="priceDisplay">
+                <span class="price-loading">시세 조회 중...</span>
+            </div>
+        </div>
+        <div class="price-right">
+            <button class="apply-btn" onclick="applyLivePrice()" id="applyBtn" style="display:none">
+                계산에 적용
+            </button>
+            <button class="refresh-btn" onclick="fetchSutPrice()" id="refreshBtn" title="새로고침">↺</button>
+        </div>
+    </div>
 
     <!-- 기본 입력 -->
     <div class="input-group">
@@ -209,7 +306,7 @@
                 <div class="price-pair">
                     <input type="number" id="creditPrice" value="3.24" step="0.01" oninput="saveData(); run()">
                     <span>/</span>
-                    <input type="number" id="sutPrice" value="0.7091" step="0.0001" oninput="saveData(); run()">
+                    <input type="number" id="sutPrice" value="0.7091" step="0.0001" oninput="onSutManual()">
                 </div>
             </div>
         </div>
@@ -249,37 +346,19 @@
             </div>
         </div>
         <div class="sch-note">
-            * 변동률: 시작 주차부터 매주 누적 적용 (예: SUT +1%/주 → 12주 후 약 +12.7%)<br>
+            * 변동률: 시작 주차부터 매주 누적 적용<br>
             * 주차별 직접 입력 체크 시 표 안에서 각 주차의 신용매수가 / SUT시세를 개별 수정 가능
         </div>
     </div>
 
     <!-- 요약 카드 -->
     <div class="summary">
-        <div class="sum-card">
-            <div class="sum-label">최종 잔여 신용대금</div>
-            <div class="sum-val mint" id="s_approved">-</div>
-        </div>
-        <div class="sum-card">
-            <div class="sum-label">최종 일지급금</div>
-            <div class="sum-val green" id="s_daily">-</div>
-        </div>
-        <div class="sum-card">
-            <div class="sum-label">최종 주정산</div>
-            <div class="sum-val green" id="s_weekly">-</div>
-        </div>
-        <div class="sum-card">
-            <div class="sum-label">기간 내 총 주정산 수령</div>
-            <div class="sum-val purple" id="s_totalWeekly">-</div>
-        </div>
-        <div class="sum-card">
-            <div class="sum-label">기간 내 총 재참여금</div>
-            <div class="sum-val mint" id="s_totalContract">-</div>
-        </div>
-        <div class="sum-card">
-            <div class="sum-label">기간 내 총 SUT매수비용<br>(Step2 별도비용 합계)</div>
-            <div class="sum-val" id="s_totalCost">-</div>
-        </div>
+        <div class="sum-card"><div class="sum-label">최종 잔여 신용대금</div><div class="sum-val mint" id="s_approved">-</div></div>
+        <div class="sum-card"><div class="sum-label">최종 일지급금</div><div class="sum-val green" id="s_daily">-</div></div>
+        <div class="sum-card"><div class="sum-label">최종 주정산</div><div class="sum-val green" id="s_weekly">-</div></div>
+        <div class="sum-card"><div class="sum-label">기간 내 총 주정산 수령</div><div class="sum-val purple" id="s_totalWeekly">-</div></div>
+        <div class="sum-card"><div class="sum-label">기간 내 총 재참여금</div><div class="sum-val mint" id="s_totalContract">-</div></div>
+        <div class="sum-card"><div class="sum-label">기간 내 총 SUT매수비용<br>(Step2 별도비용 합계)</div><div class="sum-val" id="s_totalCost">-</div></div>
     </div>
 
     <!-- 시뮬레이션 테이블 -->
@@ -313,8 +392,8 @@
 <div class="card">
     <div class="chart-title">📊 월별 수익 요약</div>
     <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div>월 주정산 수령액 (USDT)</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#ff9800"></div>월 재참여금 (USDT)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2e7d32"></div>월 주정산 수령액</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ff9800"></div>월 재참여금</div>
         <div class="legend-item"><div class="legend-dot" style="background:#00938a; border-radius:50%"></div>잔여 신용대금 (우축)</div>
     </div>
     <div class="chart-wrap">
@@ -328,7 +407,9 @@
 </div>
 
 <script>
-/* ── 유틸 ── */
+/* ════════════════════════════════
+   기본 설정
+════════════════════════════════ */
 const today = new Date();
 const weekNames = ['일','월','화','수','목','금','토'];
 document.getElementById('todayStr').textContent =
@@ -337,7 +418,6 @@ document.getElementById('todayStr').textContent =
 const f = (n, d=0) => Number(n).toLocaleString('ko-KR', {minimumFractionDigits:d, maximumFractionDigits:d});
 const ceilOne = n => Math.ceil(n * 10) / 10;
 function raw(id) { return parseFloat(document.getElementById(id).value.replace(/,/g,'')) || 0; }
-
 function fmtInput(el) {
     let v = el.value.replace(/[^0-9.]/g,'');
     let p = v.split('.');
@@ -346,7 +426,87 @@ function fmtInput(el) {
     saveData();
 }
 
-/* ── localStorage ── */
+/* ════════════════════════════════
+   SUT 실시간 시세 조회 (CoinGecko)
+════════════════════════════════ */
+let liveUSDT = null;
+let liveKRW  = null;
+let isManualSut = false; // 사용자가 수동으로 수정했는지
+
+async function fetchSutPrice() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const display    = document.getElementById('priceDisplay');
+    const applyBtn   = document.getElementById('applyBtn');
+
+    refreshBtn.classList.add('spinning');
+    display.innerHTML = '<span class="price-loading">시세 조회 중...</span>';
+    applyBtn.style.display = 'none';
+
+    try {
+        // CoinGecko public API — SUT(super-trust) 시세
+        const res = await fetch(
+            'https://api.coingecko.com/api/v3/simple/price?ids=super-trust&vs_currencies=usd,krw&include_24hr_change=true',
+            { signal: AbortSignal.timeout(8000) }
+        );
+        if (!res.ok) throw new Error('API 응답 오류');
+        const data = await res.json();
+        const d = data['super-trust'];
+        if (!d) throw new Error('데이터 없음');
+
+        liveUSDT = d.usd;
+        liveKRW  = d.krw;
+        const change = d.usd_24h_change ?? 0;
+        const chgClass = change > 0 ? 'up' : change < 0 ? 'dn' : 'flat';
+        const chgSign  = change > 0 ? '+' : '';
+        const now = new Date();
+        const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} 기준`;
+
+        display.innerHTML = `
+            <span class="price-usdt">${liveUSDT.toFixed(4)} USDT</span>
+            <span class="price-krw">≈ ₩${Math.round(liveKRW).toLocaleString('ko-KR')}</span>
+            <span class="price-change ${chgClass}">${chgSign}${change.toFixed(2)}%</span>
+            <span class="price-time">${timeStr}</span>`;
+
+        applyBtn.style.display = '';
+
+        // 사용자가 수동으로 바꾸지 않았으면 자동 반영
+        if (!isManualSut) applyLivePrice(true);
+
+    } catch (e) {
+        display.innerHTML = `<span class="price-error">시세 조회 실패 — 수동 입력을 사용하세요</span>`;
+        applyBtn.style.display = 'none';
+    } finally {
+        refreshBtn.classList.remove('spinning');
+    }
+}
+
+function applyLivePrice(silent = false) {
+    if (liveUSDT === null) return;
+    const sutInput = document.getElementById('sutPrice');
+    sutInput.value = liveUSDT.toFixed(4);
+    sutInput.classList.add('live-synced');
+    isManualSut = false;
+    saveData();
+    initAndRun();
+    if (!silent) {
+        // 적용 확인 피드백 (잠깐 버튼 텍스트 변경)
+        const btn = document.getElementById('applyBtn');
+        btn.textContent = '✓ 적용됨';
+        setTimeout(() => { btn.textContent = '계산에 적용'; }, 1500);
+    }
+}
+
+function onSutManual() {
+    // 사용자가 SUT시세를 직접 수정하면 live sync 해제
+    isManualSut = true;
+    document.getElementById('sutPrice').classList.remove('live-synced');
+    saveData();
+    run();
+}
+
+/* ════════════════════════════════
+   localStorage
+════════════════════════════════ */
 function saveData() {
     localStorage.setItem('ss2', JSON.stringify({
         baseApproved:    document.getElementById('baseApproved').value,
@@ -379,23 +539,28 @@ function loadData() {
     if (d.inlineEdit) document.getElementById('inlineEdit').checked = true;
 }
 
-/* ── 주 수 조절 ── */
+/* ════════════════════════════════
+   주 수 조절
+════════════════════════════════ */
 function chgWeeks(delta) {
     const el = document.getElementById('weeks');
     el.value = Math.min(104, Math.max(1, (parseInt(el.value)||0) + delta));
     saveData(); initAndRun();
 }
-
 function initAndRun() { initTable(); run(); }
 
-/* ── 인라인 편집 토글 ── */
+/* ════════════════════════════════
+   인라인 편집 토글
+════════════════════════════════ */
 function toggleInlineEdit() {
     const on = document.getElementById('inlineEdit').checked;
     document.getElementById('th-price').style.display = on ? '' : 'none';
     document.querySelectorAll('.price-cell-td').forEach(td => td.style.display = on ? '' : 'none');
 }
 
-/* ── 테이블 초기화 ── */
+/* ════════════════════════════════
+   테이블 초기화
+════════════════════════════════ */
 function initTable() {
     const weeks    = parseInt(document.getElementById('weeks').value) || 12;
     const inlineOn = document.getElementById('inlineEdit').checked;
@@ -444,55 +609,37 @@ function chgBoost(i, delta) {
     run();
 }
 
-/* ── 차트 ── */
+/* ════════════════════════════════
+   차트
+════════════════════════════════ */
 let myChart = null;
-
 function updateChart(monthData) {
     if (myChart) myChart.destroy();
     myChart = new Chart(document.getElementById('monthlyChart'), {
         data: {
             labels: monthData.map(m => m.label),
             datasets: [
-                {
-                    type: 'bar', label: '월 주정산', yAxisID: 'y',
-                    data: monthData.map(m => Math.round(m.weekly)),
-                    backgroundColor: '#2e7d3299', borderColor: '#2e7d32', borderWidth: 1
-                },
-                {
-                    type: 'bar', label: '월 재참여금', yAxisID: 'y',
-                    data: monthData.map(m => Math.round(m.contract)),
-                    backgroundColor: '#ff980099', borderColor: '#ff9800', borderWidth: 1
-                },
-                {
-                    type: 'line', label: '잔여 신용대금', yAxisID: 'y2',
-                    data: monthData.map(m => Math.round(m.approved)),
-                    borderColor: '#00938a', backgroundColor: '#00938a22',
-                    borderWidth: 2, pointRadius: 3, fill: false, tension: 0.3
-                }
+                { type:'bar', label:'월 주정산', yAxisID:'y', data:monthData.map(m=>Math.round(m.weekly)), backgroundColor:'#2e7d3299', borderColor:'#2e7d32', borderWidth:1 },
+                { type:'bar', label:'월 재참여금', yAxisID:'y', data:monthData.map(m=>Math.round(m.contract)), backgroundColor:'#ff980099', borderColor:'#ff9800', borderWidth:1 },
+                { type:'line', label:'잔여 신용대금', yAxisID:'y2', data:monthData.map(m=>Math.round(m.approved)), borderColor:'#00938a', backgroundColor:'#00938a22', borderWidth:2, pointRadius:3, fill:false, tension:0.3 }
             ]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { ticks: { font: { size: 11 } }, grid: { display: false } },
-                y: {
-                    position: 'left', grid: { color: '#f0f0f0' },
-                    ticks: { font: { size: 11 }, callback: v => f(v) },
-                    title: { display: true, text: '수령 / 재참여 (USDT)', font: { size: 10 } }
-                },
-                y2: {
-                    position: 'right', grid: { drawOnChartArea: false },
-                    ticks: { font: { size: 11 }, callback: v => f(v) },
-                    title: { display: true, text: '잔여 신용대금 (USDT)', font: { size: 10 } }
-                }
+            responsive:true, maintainAspectRatio:false,
+            interaction:{ mode:'index', intersect:false },
+            plugins:{ legend:{ display:false } },
+            scales:{
+                x:{ ticks:{font:{size:11}}, grid:{display:false} },
+                y:{ position:'left', grid:{color:'#f0f0f0'}, ticks:{font:{size:11}, callback:v=>f(v)}, title:{display:true, text:'수령 / 재참여 (USDT)', font:{size:10}} },
+                y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{font:{size:11}, callback:v=>f(v)}, title:{display:true, text:'잔여 신용대금 (USDT)', font:{size:10}} }
             }
         }
     });
 }
 
-/* ── 핵심 시뮬레이션 ── */
+/* ════════════════════════════════
+   핵심 시뮬레이션
+════════════════════════════════ */
 function run() {
     let approved = raw('baseApproved');
     let daily    = raw('baseDaily');
@@ -517,7 +664,6 @@ function run() {
         const dt = new Date(firstDate);
         dt.setDate(firstDate.getDate() + (i-1)*7);
 
-        // 이번 주 시세 결정
         let crPrice, sPrice;
         if (inlineOn) {
             crPrice = parseFloat(document.getElementById(`cr_${i}`)?.value)  || baseCr;
@@ -534,7 +680,6 @@ function run() {
         const costPerUnit  = 100 + step2PerUnit;
         const extra        = parseFloat(document.getElementById(`add_${i}`)?.value) || 0;
 
-        // 주정산 지급 → 잔여 감소
         const weeklyPay = daily * 7;
         approved -= weeklyPay;
         if (approved < 0) approved = 0;
@@ -557,20 +702,17 @@ function run() {
         totalContract += contractAmt;
         totalCost     += step2Cost;
 
-        // 월별 집계
         const mKey = `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
         if (!monthMap[mKey]) monthMap[mKey] = { label:`${dt.getMonth()+1}월`, weekly:0, contract:0, approved:0 };
         monthMap[mKey].weekly   += weeklyPay;
         monthMap[mKey].contract += contractAmt;
         monthMap[mKey].approved  = approved;
 
-        // 월 경계 표시
         const prevDt = new Date(firstDate);
         prevDt.setDate(firstDate.getDate() + (i-2)*7);
         const trEl = document.getElementById(`d_date_${i}`)?.closest('tr');
         if (trEl) trEl.className = (i > 1 && prevDt.getMonth() !== dt.getMonth()) ? 'month-start' : '';
 
-        // 표 업데이트
         const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
         const cls = (id, c)   => { const el=document.getElementById(id); if(el) el.className=c; };
         set(`d_date_${i}`,     `${dt.getMonth()+1}/${dt.getDate()}`);
@@ -584,7 +726,6 @@ function run() {
         cls(`d_cost_${i}`,     contractAmt>0 ? 'c-cost'     : 'c-none');
     }
 
-    // 요약 카드
     document.getElementById('s_approved').textContent      = f(approved,0)       + ' USDT';
     document.getElementById('s_daily').textContent         = f(daily,2)           + ' USDT';
     document.getElementById('s_weekly').textContent        = f(daily*7,1)         + ' USDT';
@@ -595,10 +736,12 @@ function run() {
     updateChart(Object.values(monthMap));
 }
 
-/* ── 이미지 저장 ── */
+/* ════════════════════════════════
+   이미지 저장
+════════════════════════════════ */
 function captureScreen() {
     html2canvas(document.getElementById('captureArea'), {
-        scale: 3, useCORS: true, backgroundColor: '#f4f7f9', logging: false, allowTaint: true
+        scale:3, useCORS:true, backgroundColor:'#f4f7f9', logging:false, allowTaint:true
     }).then(canvas => {
         const link = document.createElement('a');
         link.download = `SuperSave_Sim2_${new Date().toISOString().slice(0,10)}.png`;
@@ -607,11 +750,17 @@ function captureScreen() {
     });
 }
 
-/* ── 초기화 ── */
+/* ════════════════════════════════
+   초기화
+════════════════════════════════ */
 window.onload = function() {
     loadData();
     initAndRun();
     toggleInlineEdit();
+    // 실시간 시세 조회 (페이지 로드 시 자동)
+    fetchSutPrice();
+    // 5분마다 자동 갱신
+    setInterval(fetchSutPrice, 5 * 60 * 1000);
 };
 </script>
 </body>
