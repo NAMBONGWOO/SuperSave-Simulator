@@ -3,128 +3,581 @@
 <head>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="SS수량계산">
+    <meta name="apple-mobile-web-app-title" content="SS시뮬레이터">
     <meta name="theme-color" content="#00938a">
-    
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="manifest" href="manifest.json">
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SuperSave Simulator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    
+
     <style>
-        :root { --tether-mint: #00938a; --tether-navy: #1a2a40; --tether-gray: #5e6c7c; --bg: #f4f7f9; --accent: #d93025; --boost: #ff9800; }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); padding: 10px; color: var(--tether-navy); -webkit-text-size-adjust: none; }
-        .card { background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 800px; margin: auto; box-sizing: border-box; }
-        h2 { margin: 0 0 5px 0; font-weight: 800; font-size: 1.2rem; text-align: center; color: var(--tether-mint); }
-        .today-info { font-size: 0.7rem; text-align: center; color: var(--tether-gray); margin-bottom: 12px; }
-        
-        .input-group { background: #f8f9fa; padding: 12px; border-radius: 12px; margin-bottom: 15px; }
-        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .input-row label { font-size: 0.75rem; font-weight: 700; color: var(--tether-gray); }
-        
-        .input-row input, .input-row select { 
-            width: 100px; padding: 6px 5px; border: 1px solid #ddd; border-radius: 6px; 
-            text-align: right; font-weight: 800; color: var(--tether-mint); background: white; 
-            outline: none; font-size: 0.8rem; line-height: 1.2; box-sizing: border-box;
+        :root {
+            --mint: #00938a;
+            --navy: #1a2a40;
+            --gray: #5e6c7c;
+            --bg: #f4f7f9;
+            --accent: #d93025;
+            --boost: #ff9800;
         }
 
-        .save-btn { 
-            width: 100%; height: 45px; background: var(--tether-navy); color: white; border: none; 
-            border-radius: 12px; font-weight: 800; font-size: 0.9rem; margin-top: 15px; cursor: pointer;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: var(--bg);
+            padding: 10px;
+            color: var(--navy);
+            -webkit-text-size-adjust: none;
+        }
+
+        .card {
+            background: white;
+            padding: 16px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            max-width: 820px;
+            margin: auto;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-align: center;
+            color: var(--mint);
+            margin-bottom: 3px;
+        }
+
+        .sub {
+            font-size: 0.7rem;
+            text-align: center;
+            color: var(--gray);
+            margin-bottom: 14px;
+        }
+
+        /* 입력 영역 */
+        .input-group {
+            background: #f8f9fa;
+            padding: 11px 13px;
+            border-radius: 14px;
+            margin-bottom: 14px;
+        }
+
+        .irow2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .irow2:last-child { margin-bottom: 0; }
+
+        .ifield {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .ifield label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+
+        .ifield input, .ifield select {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: right;
+            font-weight: 800;
+            color: var(--mint);
+            background: white;
+            outline: none;
+            font-size: 0.85rem;
+            width: 95px;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .ifield select { width: 88px; }
+
+        .price-pair {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .price-pair input { width: 54px; }
+
+        .price-pair span {
+            font-size: 0.78rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .stepper {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-step {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background: white;
+            color: var(--mint);
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .stepper input { width: 40px; text-align: center; }
+
+        /* 요약 카드 */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .sum-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .sum-label {
+            font-size: 0.68rem;
+            color: var(--gray);
+            margin-bottom: 3px;
+        }
+
+        .sum-val {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--navy);
+        }
+
+        .sum-val.green { color: #2e7d32; }
+        .sum-val.mint  { color: var(--mint); }
+
+        /* 테이블 */
+        .tbl-wrap {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #eee;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            text-align: right;
+            white-space: nowrap;
+            table-layout: auto;
+        }
+
+        th {
+            background: var(--navy);
+            color: white;
+            padding: 8px 7px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.82rem;
+            letter-spacing: -0.2px;
+        }
+
+        td {
+            padding: 8px 7px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.82rem;
+            text-align: right;
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        /* 차수 열 고정 */
+        th:first-child, td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+        th:first-child { background: var(--navy); }
+
+        td:first-child {
+            background: #fcfcfc;
+            font-weight: 700;
+            border-right: 1px solid #eee;
+        }
+
+        /* 날짜 열 */
+        .c-date {
+            color: var(--gray);
+            text-align: center;
+            font-size: 0.78rem;
+        }
+
+        /* 추가투입 열 — 버튼+숫자 충분히 보이게 */
+        .th-add { width: 110px; }
+
+        .td-add {
+            text-align: center;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .boost-ctrl {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .btn-mini {
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            border: 1px solid #ffe0b2;
+            background: #fff3e0;
+            color: var(--boost);
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .add-input {
+            width: 50px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--boost);
+            background: white;
+            outline: none;
+            padding: 3px 2px;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        /* 셀 색상 */
+        .c-contract { color: var(--mint);   font-weight: 800; }
+        .c-cost     { color: var(--boost);  font-weight: 700; }
+        .c-daily    { color: var(--accent); font-weight: 800; }
+        .c-weekly   { color: #2e7d32;       font-weight: 800; }
+        .c-approved { color: var(--navy);   font-weight: 800; }
+        .c-none     { color: #ccc; }
+
+        /* 저장 버튼 */
+        .save-btn {
+            width: 100%;
+            height: 46px;
+            background: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            margin-top: 14px;
+            cursor: pointer;
+            font-family: 'Pretendard', sans-serif;
             box-shadow: 0 4px 10px rgba(26,42,64,0.2);
         }
+
         .save-btn:active { transform: scale(0.98); opacity: 0.9; }
 
-        .main-stepper { display: inline-flex; align-items: center; gap: 4px; }
-        .btn-main { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: white; color: var(--tether-mint); font-weight: bold; cursor: pointer; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        
-        .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid #eee; margin-top: 10px; -webkit-overflow-scrolling: touch; background: white;}
-        table { width: 100%; border-collapse: collapse; font-size: 0.65rem; text-align: center; white-space: nowrap; table-layout: auto; }
-        th { background: var(--tether-navy); color: white; padding: 8px 3px; font-weight: 600; letter-spacing: -0.3px; }
-        td { padding: 7px 3px; border-bottom: 1px solid #eee; letter-spacing: -0.4px; }
-        th:first-child, td:first-child { position: sticky; left: 0; z-index: 2; padding-left: 8px; padding-right: 8px; }
-        th:first-child { background: var(--tether-navy); }
-        td:first-child { background: #fcfcfc; font-weight: 700; border-right: 1px solid #eee; }
-        
-        /* [보정] 추가투입 열 최적화 및 표 입력란 마이크로 보정 */
-        .col-add { width: min-content; padding-left: 2px; padding-right: 2px; }
-        .boost-ctrl { display: inline-flex; align-items: center; justify-content: center; gap: 1px; vertical-align: middle;}
-        .btn-mini { width: 18px; height: 18px; border-radius: 4px; border: none; background: #fff3e0; color: var(--boost); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 1px solid #ffe0b2; flex-shrink: 0; }
-        
-        /* [보정] 표 내부 입력란 마이크로 단위 정렬 (잘림 완전 방지) */
-        .add-input { 
-            width: 32px; border: none; text-align: center; 
-            font-size: 0.75rem; font-weight: 800; color: var(--boost); 
-            background: transparent; outline: none; box-sizing: border-box;
-            /* 표 내부 여백 확보를 위한 핵심 설정 */
-            padding: 0 0 1px 0; /* 아래쪽에 미세한 여백 */
-            margin: 0; display: inline-block; vertical-align: baseline; line-height: 1;
+        .notice {
+            font-size: 0.67rem;
+            color: #aaa;
+            margin-top: 12px;
+            line-height: 1.6;
+            padding-left: 4px;
         }
 
-        .col-highlight { background: #f1f7ff; font-weight: 800; color: #0056b3; }
-        .col-accent { color: var(--accent); font-weight: 800; }
-        .col-weekly { color: #2e7d32; font-weight: 800; }
-        .col-date { color: var(--tether-gray); font-size: 0.6rem; }
-        .notice { font-size: 0.65rem; color: #999; margin-top: 12px; line-height: 1.4; padding-left: 5px; }
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+        input[type=number] { -moz-appearance: textfield; }
     </style>
 </head>
 <body>
 
 <div class="card" id="captureArea">
-    <h2>SuperSave Simulator 1.21</h2>
-    <div class="today-info" id="todayStr"></div>
-    
+    <h2>SuperSave Simulator</h2>
+    <div class="sub" id="todayStr"></div>
+
     <div class="input-group">
-        <div class="input-row"><label>잔여 신용대금 (USDT)</label><input type="text" id="baseApproved" value="0" oninput="formatAndCalc(this)"></div>
-        <div class="input-row"><label>현재 일지급금 (USDT)</label><input type="text" id="baseDaily" value="0" oninput="formatAndCalc(this)"></div>
-        <div class="input-row">
-            <label>주정산 요일</label>
-            <select id="targetDay" onchange="saveData(); runSimulation();">
-                <option value="1">월요일</option><option value="2">화요일</option><option value="3">수요일</option><option value="4">목요일</option><option value="5">금요일</option><option value="6">토요일</option><option value="0">일요일</option>
-            </select>
+        <div class="irow2">
+            <div class="ifield">
+                <label>잔여 신용대금</label>
+                <input type="text" id="baseApproved" value="2,400" oninput="fmtInput(this); run()">
+            </div>
+            <div class="ifield">
+                <label>현재 일지급금</label>
+                <input type="text" id="baseDaily" value="6.58" oninput="fmtInput(this); run()">
+            </div>
         </div>
-        <div class="input-row"><label>신용매수가 / SUT 시세</label><span><input type="number" id="creditPrice" value="3.24" style="width:40px" oninput="saveData(); runSimulation()"> / <input type="number" id="sutPrice" value="1.0" style="width:40px" oninput="saveData(); runSimulation()"></span></div>
-        <div class="input-row">
-            <label>시뮬레이션 기간 (주)</label>
-            <div class="main-stepper">
-                <button class="btn-main" onclick="changeWeeks(-4)">-</button>
-                <input type="number" id="weeks" value="12" min="1" max="52" oninput="saveData(); initAndCalc()">
-                <button class="btn-main" onclick="changeWeeks(4)">+</button>
+        <div class="irow2">
+            <div class="ifield">
+                <label>주정산 요일</label>
+                <select id="targetDay" onchange="saveData(); run()">
+                    <option value="1">월요일</option>
+                    <option value="2">화요일</option>
+                    <option value="3">수요일</option>
+                    <option value="4">목요일</option>
+                    <option value="5">금요일</option>
+                    <option value="6">토요일</option>
+                    <option value="0">일요일</option>
+                </select>
+            </div>
+            <div class="ifield">
+                <label>시뮬레이션 기간</label>
+                <div class="stepper">
+                    <button class="btn-step" onclick="chgWeeks(-4)">−</button>
+                    <input type="number" id="weeks" value="12" min="1" max="52" oninput="saveData(); initAndRun()">
+                    <button class="btn-step" onclick="chgWeeks(4)">+</button>
+                </div>
+            </div>
+        </div>
+        <div class="irow2">
+            <div class="ifield">
+                <label>신용매수가 / SUT시세</label>
+                <div class="price-pair">
+                    <input type="number" id="creditPrice" value="3.24" step="0.01" oninput="saveData(); run()">
+                    <span>/</span>
+                    <input type="number" id="sutPrice" value="0.7091" step="0.0001" oninput="saveData(); run()">
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="summary">
+        <div class="sum-card">
+            <div class="sum-label">최종 잔여 신용대금</div>
+            <div class="sum-val mint" id="s_approved">-</div>
+        </div>
+        <div class="sum-card">
+            <div class="sum-label">최종 일지급금</div>
+            <div class="sum-val green" id="s_daily">-</div>
+        </div>
+        <div class="sum-card">
+            <div class="sum-label">최종 주정산</div>
+            <div class="sum-val green" id="s_weekly">-</div>
+        </div>
+    </div>
+
+    <div class="tbl-wrap">
         <table>
             <thead>
                 <tr>
-                    <th>차수</th><th>날짜</th><th class="col-add">추가투입</th><th>가용합계</th><th>재참여</th><th>일지급</th><th>주정산</th><th>잔여대금</th>
+                    <th>차수</th>
+                    <th>날짜</th>
+                    <th class="th-add">추가투입</th>
+                    <th>가용합계</th>
+                    <th>재참여</th>
+                    <th>SUT매수</th>
+                    <th>일지급</th>
+                    <th>주정산</th>
+                    <th>잔여대금</th>
                 </tr>
             </thead>
             <tbody id="simBody"></tbody>
         </table>
     </div>
-    <div class="notice">• 단위: USDT / 표 입력란 완전 보정 v1.21</div>
+
+    <div class="notice">
+        * 단위: USDT &nbsp;|&nbsp; 재참여: 가용합계 도달 시 100 USDT 단위 자동 재참여<br>
+        * 잔여대금: 주정산 지급만큼 감소, 재참여(준비금×2.4)만큼 증가 &nbsp;|&nbsp; 단순 참조용
+    </div>
 </div>
 
-<div style="max-width: 800px; margin: auto; padding: 0 10px;">
+<div style="max-width: 820px; margin: auto; padding: 0 10px;">
     <button class="save-btn" onclick="captureScreen()">📸 시뮬레이션 결과 이미지로 저장</button>
 </div>
 
 <script>
+    /* ── 유틸 ── */
+    const today = new Date();
+    const weekNames = ['일','월','화','수','목','금','토'];
+    document.getElementById('todayStr').textContent =
+        `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일 (${weekNames[today.getDay()]}요일)`;
+
+    const f = (n, d=0) => Number(n).toLocaleString('ko-KR', {minimumFractionDigits:d, maximumFractionDigits:d});
+    const ceilOne = n => Math.ceil(n * 10) / 10;
+
+    function raw(id) {
+        return parseFloat(document.getElementById(id).value.replace(/,/g, '')) || 0;
+    }
+
+    function fmtInput(el) {
+        let v = el.value.replace(/[^0-9.]/g, '');
+        let p = v.split('.');
+        p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        el.value = p.join('.');
+        saveData();
+    }
+
+    /* ── localStorage ── */
+    function saveData() {
+        const d = {
+            baseApproved: document.getElementById('baseApproved').value,
+            baseDaily:    document.getElementById('baseDaily').value,
+            targetDay:    document.getElementById('targetDay').value,
+            creditPrice:  document.getElementById('creditPrice').value,
+            sutPrice:     document.getElementById('sutPrice').value,
+            weeks:        document.getElementById('weeks').value
+        };
+        localStorage.setItem('superSaveSimData', JSON.stringify(d));
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem('superSaveSimData');
+        if (!saved) return;
+        const d = JSON.parse(saved);
+        document.getElementById('baseApproved').value = d.baseApproved || '2,400';
+        document.getElementById('baseDaily').value    = d.baseDaily    || '6.58';
+        document.getElementById('targetDay').value    = d.targetDay    || '1';
+        document.getElementById('creditPrice').value  = d.creditPrice  || '3.24';
+        document.getElementById('sutPrice').value     = d.sutPrice     || '0.7091';
+        document.getElementById('weeks').value        = d.weeks        || '12';
+    }
+
+    /* ── 주 수 조절 ── */
+    function chgWeeks(delta) {
+        const el = document.getElementById('weeks');
+        el.value = Math.min(52, Math.max(1, (parseInt(el.value) || 0) + delta));
+        saveData();
+        initAndRun();
+    }
+
+    function initAndRun() { initTable(); run(); }
+
+    /* ── 테이블 초기화 ── */
+    function initTable() {
+        const weeks = parseInt(document.getElementById('weeks').value) || 12;
+        const tbody = document.getElementById('simBody');
+        tbody.innerHTML = '';
+        for (let i = 1; i <= weeks; i++) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${i}</td>
+                <td class="c-date" id="d_date_${i}">-</td>
+                <td class="td-add">
+                    <div class="boost-ctrl">
+                        <button class="btn-mini" onclick="chgBoost(${i}, -100)">−</button>
+                        <input class="add-input" type="number" id="add_${i}" value="0" oninput="run()">
+                        <button class="btn-mini" onclick="chgBoost(${i}, 100)">+</button>
+                    </div>
+                </td>
+                <td id="d_total_${i}">-</td>
+                <td id="d_contract_${i}" class="c-none">-</td>
+                <td id="d_cost_${i}" class="c-none">-</td>
+                <td class="c-daily" id="d_daily_${i}">-</td>
+                <td class="c-weekly" id="d_weekly_${i}">-</td>
+                <td class="c-approved" id="d_approved_${i}">-</td>`;
+            tbody.appendChild(tr);
+        }
+    }
+
+    function chgBoost(i, delta) {
+        const el = document.getElementById(`add_${i}`);
+        el.value = Math.max(0, (parseFloat(el.value) || 0) + delta);
+        run();
+    }
+
+    /* ── 핵심 시뮬레이션 ── */
+    function run() {
+        let approved = raw('baseApproved');
+        let daily    = raw('baseDaily');
+        const crPrice   = parseFloat(document.getElementById('creditPrice').value) || 3.24;
+        const sPrice    = parseFloat(document.getElementById('sutPrice').value)    || 0.7091;
+        const targetDay = parseInt(document.getElementById('targetDay').value);
+        const weeks     = parseInt(document.getElementById('weeks').value) || 12;
+        const co        = crPrice / 1.2; // 회사보유분 매수가 (역산)
+
+        // 첫 주정산일 계산
+        let diff = targetDay - today.getDay();
+        if (diff <= 0) diff += 7;
+        const firstDate = new Date(today);
+        firstDate.setDate(today.getDate() + diff);
+
+        // 100 USDT 준비금 단위당 비용
+        const sutPerUnit  = ceilOne(100 / co);   // Step1에서 필요한 SUT (소수점1자리 올림)
+        const step2PerUnit = sutPerUnit * sPrice; // Step2 SUT 매수 비용
+        const costPerUnit  = 100 + step2PerUnit;  // 단위당 총 비용
+
+        let carry = 0; // 이월금
+
+        for (let i = 1; i <= weeks; i++) {
+            const dt = new Date(firstDate);
+            dt.setDate(firstDate.getDate() + (i - 1) * 7);
+
+            const extra = parseFloat(document.getElementById(`add_${i}`)?.value) || 0;
+
+            // 주정산 지급 → 잔여 신용대금 감소
+            const weeklyPay = daily * 7;
+            approved -= weeklyPay;
+            if (approved < 0) approved = 0;
+
+            // 가용합계 = 주정산 + 이월 + 추가투입
+            const available = weeklyPay + carry + extra;
+
+            // 재참여 계산 (100 USDT 단위)
+            const units       = costPerUnit > 0 ? Math.floor(available / costPerUnit) : 0;
+            const contractAmt = units * 100;
+            const step2Cost   = units * step2PerUnit;
+
+            if (contractAmt > 0) {
+                const newCredit = contractAmt * 2.4;
+                approved += newCredit;
+                daily    += newCredit / 365;
+                carry     = available - (contractAmt + step2Cost);
+            } else {
+                carry = available;
+            }
+
+            // 표 업데이트
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            const cls = (id, c)   => { const el = document.getElementById(id); if (el) el.className   = c;   };
+
+            set(`d_date_${i}`,     `${dt.getMonth()+1}/${dt.getDate()}`);
+            set(`d_total_${i}`,    f(available, 0));
+            set(`d_contract_${i}`, contractAmt > 0 ? f(contractAmt) : '-');
+            set(`d_cost_${i}`,     contractAmt > 0 ? f(step2Cost, 1) : '-');
+            set(`d_daily_${i}`,    f(daily, 2));
+            set(`d_weekly_${i}`,   f(daily * 7, 1));
+            set(`d_approved_${i}`, f(approved, 0));
+            cls(`d_contract_${i}`, contractAmt > 0 ? 'c-contract' : 'c-none');
+            cls(`d_cost_${i}`,     contractAmt > 0 ? 'c-cost'     : 'c-none');
+        }
+
+        // 요약 카드
+        document.getElementById('s_approved').textContent = f(approved, 0) + ' USDT';
+        document.getElementById('s_daily').textContent    = f(daily, 2)    + ' USDT';
+        document.getElementById('s_weekly').textContent   = f(daily * 7, 1) + ' USDT';
+    }
+
+    /* ── 이미지 저장 ── */
     function captureScreen() {
-        const target = document.getElementById('captureArea');
-        html2canvas(target, {
-            scale: 3, // 고화질 배율 증가
+        html2canvas(document.getElementById('captureArea'), {
+            scale: 3,
             useCORS: true,
             backgroundColor: '#f4f7f9',
-            logging: false, // 로깅 제외
+            logging: false,
             allowTaint: true
         }).then(canvas => {
             const link = document.createElement('a');
@@ -134,135 +587,11 @@
         });
     }
 
-    const f = (n, d = 0) => n.toLocaleString(undefined, {minimumFractionDigits: d, maximumFractionDigits: d});
-    const today = new Date(2026, 2, 17);
-    const weekNames = ['일', '월', '화', '수', '목', '금', '토'];
-    document.getElementById('todayStr').innerText = `접속일: 2026년 3월 17일 (${weekNames[today.getDay()]}요일)`;
-
-    window.onload = function() {
+    /* ── 초기화 ── */
+    window.onload = function () {
         loadData();
-        initAndCalc();
+        initAndRun();
     };
-
-    function saveData() {
-        const data = {
-            baseApproved: document.getElementById('baseApproved').value,
-            baseDaily: document.getElementById('baseDaily').value,
-            targetDay: document.getElementById('targetDay').value,
-            creditPrice: document.getElementById('creditPrice').value,
-            sutPrice: document.getElementById('sutPrice').value,
-            weeks: document.getElementById('weeks').value
-        };
-        localStorage.setItem('superSaveData', JSON.stringify(data));
-    }
-
-    function loadData() {
-        const saved = localStorage.getItem('superSaveData');
-        if (saved) {
-            const data = JSON.parse(saved);
-            document.getElementById('baseApproved').value = data.baseApproved || "0";
-            document.getElementById('baseDaily').value = data.baseDaily || "0";
-            document.getElementById('targetDay').value = data.targetDay || "1";
-            document.getElementById('creditPrice').value = data.creditPrice || "3.24";
-            document.getElementById('sutPrice').value = data.sutPrice || "1.0";
-            document.getElementById('weeks').value = data.weeks || "12";
-        }
-    }
-
-    function formatAndCalc(el) {
-        let val = el.value.replace(/[^0-9.]/g, '');
-        if (val !== "") {
-            let parts = val.split('.');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-            el.value = parts.join('.');
-        }
-        saveData();
-        runSimulation();
-    }
-
-    function getRawNum(id) { return parseFloat(document.getElementById(id).value.replace(/,/g, "")) || 0; }
-    function initAndCalc() { initTable(); runSimulation(); }
-
-    function changeWeeks(delta) {
-        const input = document.getElementById('weeks');
-        input.value = Math.min(52, Math.max(1, (parseInt(input.value) || 0) + delta));
-        saveData();
-        initAndCalc();
-    }
-
-    function changeBoost(idx, delta) {
-        const input = document.getElementById(`add_${idx}`);
-        input.value = Math.max(0, (parseFloat(input.value) || 0) + delta);
-        adjustWidth(input);
-        runSimulation();
-    }
-
-    function adjustWidth(el) {
-        const len = el.value.length;
-        el.style.width = (len > 3) ? (len * 7 + 10) + 'px' : '32px';
-    }
-
-    function initTable() {
-        let weeks = parseInt(document.getElementById('weeks').value) || 12;
-        const tbody = document.getElementById('simBody');
-        tbody.innerHTML = '';
-        for (let i = 1; i <= weeks; i++) {
-            tbody.innerHTML += `<tr>
-                <td>${i}</td><td id="date_${i}" class="col-date">-</td>
-                <td class="col-add"><div class="boost-ctrl"><button class="btn-mini" onclick="changeBoost(${i}, -50)">-</button>
-                <input type="number" class="add-input" id="add_${i}" value="0" oninput="adjustWidth(this); runSimulation()">
-                <button class="btn-mini" onclick="changeBoost(${i}, 50)">+</button></div></td>
-                <td id="total_${i}">-</td><td class="col-highlight" id="contract_${i}">-</td>
-                <td class="col-accent" id="daily_${i}">-</td><td class="col-weekly" id="weekly_${i}">-</td><td id="approved_${i}">-</td>
-            </tr>`;
-        }
-    }
-
-    function runSimulation() {
-        let currentApproved = getRawNum('baseApproved');
-        let currentDaily = getRawNum('baseDaily');
-        const crPrice = getRawNum('creditPrice'), sPrice = getRawNum('sutPrice');
-        const targetDay = parseInt(document.getElementById('targetDay').value);
-        const weeks = parseInt(document.getElementById('weeks').value) || 0;
-        
-        let diff = targetDay - today.getDay();
-        if (diff <= 0) diff += 7; 
-        
-        let firstStakingDate = new Date(today);
-        firstStakingDate.setDate(today.getDate() + diff);
-        let carryOver = 0;
-
-        for (let i = 1; i <= weeks; i++) {
-            let dCur = new Date(firstStakingDate); 
-            dCur.setDate(firstStakingDate.getDate() + (i-1) * 7);
-            if(document.getElementById(`date_${i}`)) document.getElementById(`date_${i}`).innerText = `${dCur.getMonth() + 1}/${dCur.getDate()}`;
-            
-            const addInput = document.getElementById(`add_${i}`);
-            let extra = addInput ? (parseFloat(addInput.value) || 0) : 0;
-            
-            let reward = currentDaily * 7;
-            let thisWeekTotal = reward + carryOver + extra;
-            
-            const unitCost = 100 + ((100 / crPrice) * 1.2 * sPrice);
-            let units = (unitCost > 0) ? Math.floor(thisWeekTotal / unitCost) : 0;
-            let conAmt = units * 100;
-
-            if (conAmt > 0) {
-                let conCost = conAmt + (Math.ceil(conAmt / crPrice * 1.2) * sPrice);
-                currentApproved += (conAmt * 2.4);
-                currentDaily += (conAmt * 2.4 / 365);
-                carryOver = thisWeekTotal - conCost;
-            } else {
-                carryOver = thisWeekTotal;
-            }
-
-            if(document.getElementById(`total_${i}`)) document.getElementById(`total_${i}`).innerText = f(thisWeekTotal, 0);
-            if(document.getElementById(`daily_${i}`)) document.getElementById(`daily_${i}`).innerText = f(currentDaily, 1);
-            if(document.getElementById(`weekly_${i}`)) document.getElementById(`weekly_${i}`).innerText = f(currentDaily * 7, 1);
-            if(document.getElementById(`approved_${i}`)) document.getElementById(`approved_${i}`).innerText = f(currentApproved, 0);
-            if(document.getElementById(`contract_${i}`)) document.getElementById(`contract_${i}`).innerText = conAmt > 0 ? f(conAmt) : '-';
-        }
-    }
 </script>
 </body>
 </html>
